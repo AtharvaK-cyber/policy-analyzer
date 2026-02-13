@@ -1,0 +1,4 @@
+DPDP: Users must be informed if data is shared with third parties.
+DPDP: Sensitive data should be minimized.
+Risk: Sharing location with advertisers increases privacy risk.
+Risk: No retention period increases uncertainty.

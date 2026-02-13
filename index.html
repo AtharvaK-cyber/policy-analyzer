@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Privacy Analyzer</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family: 'Segoe UI', sans-serif;
+}
+
+body{
+background: linear-gradient(120deg,#141e30,#243b55);
+color:white;
+}
+
+/* NAVBAR */
+
+nav{
+display:flex;
+justify-content:space-between;
+padding:20px 50px;
+background:rgba(0,0,0,0.3);
+backdrop-filter: blur(8px);
+}
+
+nav h2{
+color:#00e6e6;
+}
+
+nav button{
+padding:10px 20px;
+border:none;
+border-radius:25px;
+background:#00e6e6;
+cursor:pointer;
+transition:0.3s;
+}
+
+nav button:hover{
+background:white;
+color:black;
+}
+
+/* HERO */
+
+.hero{
+text-align:center;
+padding:60px 20px;
+}
+
+.hero img{
+width:250px;
+margin-top:20px;
+}
+
+.hero h1{
+font-size:40px;
+margin-bottom:10px;
+}
+
+.hero p{
+opacity:0.8;
+margin-bottom:20px;
+}
+
+.main-btn{
+padding:12px 25px;
+border-radius:30px;
+border:none;
+background:#ff7b00;
+color:white;
+font-size:16px;
+cursor:pointer;
+transition:0.3s;
+}
+
+.main-btn:hover{
+transform:scale(1.1);
+background:#ffaa00;
+}
+
+/* FEATURES */
+
+.features{
+display:flex;
+justify-content:center;
+gap:30px;
+flex-wrap:wrap;
+padding:40px;
+}
+
+.card{
+width:260px;
+padding:25px;
+border-radius:15px;
+background:rgba(255,255,255,0.1);
+backdrop-filter: blur(10px);
+transition:0.3s;
+text-align:center;
+}
+
+.card img{
+width:80px;
+margin-bottom:10px;
+}
+
+.card:hover{
+transform:translateY(-10px);
+background:rgba(255,255,255,0.2);
+}
+
+/* ANALYZER */
+
+.analyzer{
+padding:40px;
+text-align:center;
+}
+
+textarea{
+width:70%;
+height:150px;
+padding:15px;
+border-radius:10px;
+border:none;
+margin-top:15px;
+}
+
+.action-btn{
+margin-top:15px;
+padding:12px 25px;
+border:none;
+border-radius:25px;
+background:#00ff9d;
+font-weight:bold;
+cursor:pointer;
+transition:0.3s;
+}
+
+.action-btn:hover{
+background:white;
+color:black;
+}
+
+.result{
+margin-top:20px;
+font-size:20px;
+display:none;
+}
+
+/* FOOTER */
+
+footer{
+text-align:center;
+padding:20px;
+opacity:0.6;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav>
+<h2>PrivacyAI</h2>
+<button>Login</button>
+</nav>
+
+<!-- HERO SECTION -->
+<div class="hero">
+<h1>AI Privacy Policy Analyzer</h1>
+<p>Understand privacy policies in seconds using AI</p>
+
+<button class="main-btn" onclick="scrollToAnalyzer()">Try Now</button>
+
+<br>
+<img src="https://cdn-icons-png.flaticon.com/512/4149/4149671.png">
+</div>
+
+<!-- FEATURES -->
+<div class="features">
+
+<div class="card">
+<img src="https://cdn-icons-png.flaticon.com/512/1048/1048953.png">
+<h3>AI Summary</h3>
+<p>Get easy explanation of long policies</p>
+</div>
+
+<div class="card">
+<img src="https://cdn-icons-png.flaticon.com/512/565/565547.png">
+<h3>Risk Detection</h3>
+<p>Identify dangerous data collection practices</p>
+</div>
+
+<div class="card">
+<img src="https://cdn-icons-png.flaticon.com/512/3064/3064197.png">
+<h3>Safe Score</h3>
+<p>Know how secure a website is instantly</p>
+</div>
+
+</div>
+
+<!-- ANALYZER -->
+<div class="analyzer" id="analyzerSection">
+
+<h2>Paste Privacy Policy</h2>
+
+<textarea id="policyInput" placeholder="Paste policy here..."></textarea>
+<br>
+
+<button class="action-btn" onclick="analyze()">Analyze Policy</button>
+
+<div class="result" id="resultBox">
+✅ Policy looks moderately safe
+</div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+© 2026 AI Privacy Analyzer Project
+</footer>
+
+<script>
+
+function scrollToAnalyzer(){
+document.getElementById("analyzerSection").scrollIntoView({behavior:"smooth"});
+}
+
+async function analyze(){
+
+let text = document.getElementById("policyInput").value;
+
+if(text.length < 10){
+alert("Please paste a privacy policy");
+return;
+}
+
+try{
+
+let response = await fetch("http://127.0.0.1:8000/analyze-policy", {
+method: "POST",
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify({
+policy: text
+})
+});
+
+let data = await response.json();
+
+let resultBox = document.getElementById("resultBox");
+
+// Color based on risk
+let color = "white";
+
+if(data.risk_level === "HIGH") color = "red";
+if(data.risk_level === "MEDIUM") color = "orange";
+if(data.risk_level === "SAFE") color = "lightgreen";
+
+resultBox.style.color = color;
+
+resultBox.innerHTML = `
+<b>Summary:</b> ${data.summary}<br><br>
+
+<b>Risk Level:</b> ${data.risk_level}<br>
+<b>Score:</b> ${data.risk_score}<br>
+<b>Decision:</b> ${data.decision}<br><br>
+
+<b>Risks:</b><br>
+${data.risk_factors.join("<br>")}
+`;
+
+resultBox.style.display = "block";
+
+}catch(err){
+
+alert("Backend connection failed!");
+console.log(err);
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
